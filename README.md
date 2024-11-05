@@ -1,14 +1,12 @@
 # Small Campus Network LAB
 
 ## Objective
-[Brief Objective - Remove this afterwards]
 
 The Detection Lab project aimed to establish a controlled environment for simulating and detecting cyber attacks. The primary focus was to ingest and analyze logs within a Security Information and Event Management (SIEM) system, generating test telemetry to mimic real-world attack scenarios. This hands-on experience was designed to deepen understanding of network security, attack patterns, and defensive strategies.
 
 The Campus Network Lab project demonstrates the setup and configuration of a campus network with VLANs for department segmentation and a router for inter-VLAN routing to enhance network security and organization.
 
 ### Skills Learned
-[Bullet Points - Remove this afterwards]
 
 - Network design and topology planning.
 - Vlan configuration and management.
@@ -21,7 +19,6 @@ The Campus Network Lab project demonstrates the setup and configuration of a cam
 - Understanding of Layer 2 and 3 concepts.
 
 ### Tools Used
-[Bullet Points - Remove this afterwards]
 
 - VLAN configuration, inter-VLAN routing, Cisco Packet Tracer, Cisco IOS commands.
 
@@ -415,11 +412,11 @@ VLAN Name                             Status    Ports
 2. Shutdown unused interfaces
 
 ```bash
-R1(config)#interface range FastEthernet 0/4-24, gigabitEthernet 0/2, vlan 1
-R1(config-if-range)#description Unused
-R1(config-if-range)#shutdown
+S1(config)#interface range FastEthernet 0/4-24, gigabitEthernet 0/2, vlan 1
+S1(config-if-range)#description Unused
+S1(config-if-range)#shutdown
 
-R1(config-if-range)#
+S1(config-if-range)#
 %LINK-5-CHANGED: Interface FastEthernet0/4, changed state to administratively down
 
 %LINK-5-CHANGED: Interface FastEthernet0/5, changed state to administratively down
@@ -464,7 +461,8 @@ R1(config-if-range)#
 
 %LINK-5-CHANGED: Interface GigabitEthernet0/2, changed state to administratively down
 
-R1(config-if-range)#end 
+S1(config-if-range)#end
+S1# 
 ```
 
 This is the result

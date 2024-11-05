@@ -1558,7 +1558,7 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | R1 (VLAN 10)          | 172.16.10.33   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
 
-### Importance of Ping tests
+## Importance of Ping tests
 
 The importance of Ping tests in this regard are for the following:
 
@@ -1580,7 +1580,7 @@ The importance of Ping tests in this regard are for the following:
 | Ensuring network performance.            | Successful pings with low latency confirm that there are  |
 |                                          | no delays or connectivity issues in the network path.     |
 
-### Conclusion
+## Conclusion
 
 This project demonstrated a successful setup of a VLAN-based network that includes inter-VLAN routing and a dedicated Voice VLAN, following a structured configuration approach. The project highlights the following key outcomes:
 

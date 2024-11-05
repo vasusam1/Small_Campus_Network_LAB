@@ -23,9 +23,25 @@ The Campus Network Lab project demonstrates the setup and configuration of a cam
 - VLAN configuration, inter-VLAN routing, Cisco Packet Tracer, Cisco IOS commands.
 
 ## Steps
-drag & drop screenshots here or use imgur and reference them using imgsrc
 
-Every screenshot should have some text explaining what the screenshot is about.
+I wanted to create a network for a campus based on the following requirements:
+- The IT section needs 25 hosts.
+- The Students need 1500 hosts.
+- Faculty needs 200 hosts.
+- Faculty also needs IP phones (also 200 hosts).
+- There has to be management just incase of remoting into a switch or router for troubleshooting.
+
+Based off of that I have created the subnets as shown below.
+
+| Vlan Name                 | Hosts     | Network Address | Broadcast          | First        | Last         |
+| ------------------------- | --------- | --------------- | ------------------ | ------------ | ------------ |
+| Vlan 10 (IT)              | 25        | 172.16.10.0     | 172.16.10.31       | 172.16.10.1  | 172.16.10.30 |
+| Vlan 20 (Students)        | 1500      | 172.16.0.0      | 172.16.7.255       | 172.16.0.1   | 172.16.7.254 |
+| Vlan 30 (Faculty)         | 200       | 172.16.9.0      | 172.16.9.255       | 172.16.9.1   | 172.16.9.254 |
+| Vlan 40 (Voice IP phones) | 200       | 172.16.8.0      | 172.16.8.255       | 172.16.8.1   | 172.16.8.254 |
+| Vlan 80 (Management)      | 10        | 172.16.10.32    | 172.16.10.47       | 172.16.10.33 | 172.16.10.46 |
+| Vlan 99 (Native)          | 4 (Trunk) | 172.16.10.48    | 172.16.10.55       | 172.16.10.49 | 172.16.10.54 |
+
 ### Network topology diagram 
 
 ![Network Setup and Configuration Project - Topology](https://github.com/user-attachments/assets/2ce25691-d15f-47cc-84ed-a98e26a90573)

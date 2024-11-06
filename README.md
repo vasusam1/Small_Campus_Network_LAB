@@ -17,6 +17,7 @@ The Campus Network Lab project demonstrates the setup and configuration of a cam
 - Network security basics.
 - Documentation and presentation of technical work.
 - Understanding of Layer 2 and 3 concepts.
+- IPv6 addressing and subnetting.
 
 ### Tools Used
 
@@ -31,7 +32,7 @@ I wanted to create a network for a campus based on the following requirements:
 - Faculty also needs IP phones (also 200 hosts).
 - There has to be management just incase of remoting into a switch or router for troubleshooting.
 
-Based off of that I have created the subnets as shown below.
+Based off of that I have created the IPv4 subnets as shown below.
 
 | Vlan Name                 | Hosts     | Network Address | Broadcast          | First        | Last         |
 | ------------------------- | --------- | --------------- | ------------------ | ------------ | ------------ |
@@ -47,25 +48,146 @@ Based off of that I have created the subnets as shown below.
 ![Network Setup and Configuration Project - Topology](https://github.com/user-attachments/assets/2ce25691-d15f-47cc-84ed-a98e26a90573)
 
 ### Addressing Table 
-
-| Device Name            | Interface              | IP Address            | Subnet                | Default Gateway |
-| ---------------------- | ---------------------- | --------------------- | --------------------- | --------------- |
-| R1                     | G0/0/0.10 (IT)         | 172.16.10.1           | 255.255.255.224   /27 | N/A             |
-|                        | G0/0/0.20 (Students)   | 172.16.0.1            | 255.255.248.0     /21 | N/A             |
-|                        | G0/0/0.30 (Faculty)    | 172.16.9.1            | 255.255.255.0     /24 | N/A             |
-|                        | G0/0/0.40 (Voice)      | 172.16.8.1            | 255.255.255.0     /24 | N/A             |
-|                        | G0/0/0.80 (Management) | 172.16.10.33          | 255.255.255.240   /28 | N/A             |
-|                        | G0/0/0.99 (Native)     | 172.16.10.49          | 255.255.255.248   /29 | N/A             |
-| PC-1                   | NIC                    | 172.16.10.30          | 255.255.255.224   /27 | 172.16.10.1     |
-| PC-2                   | NIC                    | 172.16.7.254          | 255.255.248.0     /21 | 172.16.0.1      |
-| PC-3                   | NIC                    | 172.16.9.253          | 255.255.255.0     /24 | 172.16.9.1      |
-| PC-4                   | NIC                    | 172.16.10.29          | 255.255.255.224   /27 | 172.16.10.1     |
-| PC-5                   | NIC                    | 172.16.7.253          | 255.255.248.0     /21 | 172.16.0.1      |
-| PC-6                   | NIC                    | 172.16.9.252          | 255.255.255.0     /24 | 172.16.9.1      |
-| PC-7                   | NIC                    | 172.16.9.254          | 255.255.255.0     /24 | 172.16.9.1      |
-| S1                     | VLAN 88                | 172.16.10.34          | 255.255.255.240   /28 | 172.16.10.33    |
-| S2                     | VLAN 88                | 172.16.10.35          | 255.255.255.240   /28 | 172.16.10.33    |
-| S3                     | VLAN 88                | 172.16.10.36          | 255.255.255.240   /28 | 172.16.10.33    |
+<table>
+    <tr>
+        <td>Device Name</td>
+        <td>Interface</td>
+        <td>IP Address</td>
+        <td>Subnet</td>
+        <td>Default Gateway</td>
+    </tr>
+    <tr>
+        <td rowspan=12>R1</td>
+        <td rowspan=3>G0/0/0.10 (IT)</td>
+        <td>172.16.10.1</td>
+        <td>255.255.255.224   /27</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:1::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan=3>G0/0/0.20 (Students)</td>
+        <td>172.16.0.1</td>
+        <td>255.255.248.0     /21</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:2::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan=3>G0/0/0.30 (Faculty)</td>
+        <td>172.16.9.1</td>
+        <td>255.255.255.0     /24</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:3::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan=3>G0/0/0.40 (Voice)</td>
+        <td>172.16.8.1</td>
+        <td>255.255.255.0     /24</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:4::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan=3>G0/0/0.80 (Management)</td>
+        <td>172.16.10.33</td>
+        <td>255.255.255.240   /28</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:5::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan=3>G0/0/0.99 (Native)</td>
+        <td>172.16.10.49</td>
+        <td>255.255.255.248   /29</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:6::1/64</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>PC-1</td>
+        <td>NIC</td>
+        <td>172.16.10.30</td>
+        <td>255.255.255.224   /27</td>
+        <td>172.16.10.1</td>
+    </tr>
+    <tr>
+        <td>PC-2</td>
+        <td>NIC</td>
+        <td>172.16.7.254</td>
+        <td>255.255.248.0     /21</td>
+        <td>172.16.0.1</td>
+    </tr>
+    <tr>
+        <td>PC-3</td>
+        <td>NIC</td>
+        <td>172.16.9.253</td>
+        <td>255.255.255.0     /24</td>
+        <td>172.16.9.1</td>
+    </tr>
+    <tr>
+        <td>PC-4</td>
+        <td>NIC</td>
+        <td>172.16.10.29</td>
+        <td>255.255.255.224   /27</td>
+        <td>172.16.10.1</td>
+    </tr>
+    <tr>
+        <td>PC-5</td>
+        <td>NIC</td>
+        <td>172.16.7.253</td>
+        <td>255.255.248.0     /21</td>
+        <td>172.16.0.1</td>
+    </tr>
+    <tr>
+        <td>PC-6</td>
+        <td>NIC</td>
+        <td>172.16.9.252</td>
+        <td>255.255.255.0     /24</td>
+        <td>172.16.9.1</td>
+    </tr>
+    <tr>
+        <td>PC-7</td>
+        <td>NIC</td>
+        <td>172.16.9.254</td>
+        <td>255.255.255.0     /24</td>
+        <td>172.16.9.1</td>
+    </tr>
+    <tr>
+        <td>S1</td>
+        <td>VLAN 88</td>
+        <td>172.16.10.34</td>
+        <td>255.255.255.240   /28</td>
+        <td>172.16.10.33</td>
+    </tr>
+    <tr>
+        <td>S2</td>
+        <td>VLAN 88</td>
+        <td>172.16.10.35</td>
+        <td>255.255.255.240   /28</td>
+        <td>172.16.10.33</td>
+    </tr>
+    <tr>
+        <td>S3</td>
+        <td>VLAN 88</td>
+        <td>172.16.10.36</td>
+        <td>255.255.255.240   /28</td>
+        <td>172.16.10.33</td>
+    </tr>
+</table>
 
 ### Configuration Guide
 

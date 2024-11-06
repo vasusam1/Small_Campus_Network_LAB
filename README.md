@@ -40,7 +40,7 @@ Based off of that I have created the subnets as shown below.
 | Vlan 30 (Faculty)         | 200       | 172.16.9.0      | 172.16.9.255       | 172.16.9.1   | 172.16.9.254 |
 | Vlan 40 (Voice IP phones) | 200       | 172.16.8.0      | 172.16.8.255       | 172.16.8.1   | 172.16.8.254 |
 | Vlan 80 (Management)      | 10        | 172.16.10.32    | 172.16.10.47       | 172.16.10.33 | 172.16.10.46 |
-| Vlan 99 (Native)          | 4 (Trunk) | 172.16.10.48    | 172.16.10.55       | 172.16.10.49 | 172.16.10.54 |
+| Vlan 99 (Native)          | 4         | 172.16.10.48    | 172.16.10.55       | 172.16.10.49 | 172.16.10.54 |
 
 ### Network topology diagram 
 
@@ -63,9 +63,9 @@ Based off of that I have created the subnets as shown below.
 | PC-5                   | NIC                    | 172.16.7.253          | 255.255.248.0     /21 | 172.16.0.1      |
 | PC-6                   | NIC                    | 172.16.9.252          | 255.255.255.0     /24 | 172.16.9.1      |
 | PC-7                   | NIC                    | 172.16.9.254          | 255.255.255.0     /24 | 172.16.9.1      |
-| S1                     | VLAN 99                | 172.16.10.50          | 255.255.255.248   /29 | 172.16.10.49    |
-| S2                     | VLAN 99                | 172.16.10.51          | 255.255.255.248   /29 | 172.16.10.49    |
-| S3                     | VLAN 99                | 172.16.10.52          | 255.255.255.248   /29 | 172.16.10.49    |
+| S1                     | VLAN 88                | 172.16.10.34          | 255.255.255.240   /28 | 172.16.10.33    |
+| S2                     | VLAN 88                | 172.16.10.35          | 255.255.255.240   /28 | 172.16.10.33    |
+| S3                     | VLAN 88                | 172.16.10.36          | 255.255.255.240   /28 | 172.16.10.33    |
 
 ### Configuration Guide
 
@@ -183,12 +183,12 @@ R1(config-if)# exit
 R1(config)# 
 ```
 
-3e. Assign GigabitEthernet0/0/0.80 to VLAN 80 (Management).
+3e. Assign GigabitEthernet0/0/0.80 to VLAN 80 (Management) and set as native.
 
 ```bash
 # Assign GigabitEthernet0/0/0.80 to VLAN 80 (Management)
 R1(config)# interface GigabitEthernet0/0/0.80
-R1(config-if)# encapsulation dot1Q 80
+R1(config-if)# encapsulation dot1Q 80 native
 R1(config-if)# ip address 172.16.10.33 255.255.255.240
 R1(config-if)# no shutdown
 R1(config-if)# exit
@@ -199,8 +199,8 @@ R1(config)#
 
 ```bash
 # Assign GigabitEthernet0/0/0.99 to VLAN 99 (Native)
-R1(config)# interface GigabitEthernet0/0/0.80
-R1(config-if)# encapsulation dot1Q 99 native
+R1(config)# interface GigabitEthernet0/0/0.99
+R1(config-if)# encapsulation dot1Q 99
 R1(config-if)# ip address 172.16.10.49 255.255.255.248
 R1(config-if)# no shutdown
 R1(config-if)# exit
@@ -315,12 +315,12 @@ interface GigabitEthernet0/0/0.40
 !
 interface GigabitEthernet0/0/0.80
  description Management VLAN
- encapsulation dot1Q 80
+ encapsulation dot1Q 80 native
  ip address 172.16.10.33 255.255.255.240
 !
 interface GigabitEthernet0/0/0.99
  description Trunk VLAN
- encapsulation dot1Q 99 native
+ encapsulation dot1Q 99
  ip address 172.16.10.49 255.255.255.248
 !
 interface GigabitEthernet0/0/1
@@ -460,13 +460,14 @@ VLAN Name                             Status    Ports
 1005 trnet-default                    active  
 ```
 
-3. Assign an IP address and subnet mask for VLAN 99 according to the addressing table.
+3. Assign an IP address and subnet mask for VLAN 80 according to the addressing table.
 
 ```bash
-#Assign an IP address and subnet mask for VLAN 99.
+#Assign an IP address and subnet mask for VLAN 80.
 S1#configure terminal
-S1(config)#interface vlan 99
-S1(config-if)#ip address 172.16.10.50 255.255.255.248
+S1(config)#interface vlan 80
+S1(config-if)#description S1 VLAN address
+S1(config-if)#ip address 172.16.10.35 255.255.255.240
 S1(config-if)#no shutdown
 S1(config-if)#exit
 ```
@@ -479,7 +480,7 @@ S1(config)# interface range FastEthernet0/1-2
 S1(config-if)switchport mode trunk
 
 #Set native vlan as 99 with allowed vlans as the following and issue no shutdown.
-S1(config-if)switchport trunk native vlan 99
+S1(config-if)switchport trunk native vlan 80
 S1(config-if)switchport trunk allowed vlan 10,20,30,40,80,99
 S1(config-if)#no shutdown
 
@@ -561,9 +562,9 @@ Trunks should look like the following.
 ```bash
 S1#show interfaces trunk
 Port        Mode         Encapsulation  Status        Native vlan
-Fa0/1       on           802.1q         trunking      99
-Fa0/2       on           802.1q         trunking      99
-Gig0/1      on           802.1q         trunking      99
+Fa0/1       on           802.1q         trunking      80
+Fa0/2       on           802.1q         trunking      80
+Gig0/1      on           802.1q         trunking      80
 
 Port        Vlans allowed on trunk
 Fa0/1       10,20,30,40,80,99
@@ -672,7 +673,7 @@ FastEthernet0/24       unassigned      YES manual administratively down down
 GigabitEthernet0/1     unassigned      YES manual up                    up 
 GigabitEthernet0/2     unassigned      YES manual administratively down down 
 Vlan1                  unassigned      YES manual administratively down down 
-Vlan99                 172.16.10.50    YES manual up                    up
+Vlan80                 172.16.10.34    YES manual up                    up
 S1#
 ```
 
@@ -708,13 +709,13 @@ spanning-tree extend system-id
 !
 interface FastEthernet0/1
  description trunk line for vlan 10,20,30,80 and 99
- switchport trunk native vlan 99
+ switchport trunk native vlan 80
  switchport trunk allowed vlan 10,20,30,40,80,99
  switchport mode trunk
 !
 interface FastEthernet0/2
  description trunk line for vlan 10,20,30,80 and 99
- switchport trunk native vlan 99
+ switchport trunk native vlan 80
  switchport trunk allowed vlan 10,20,30,40,80,99
  switchport mode trunk
 !
@@ -809,7 +810,7 @@ interface FastEthernet0/24
  shutdown
 !
 interface GigabitEthernet0/1
- switchport trunk native vlan 99
+ switchport trunk native vlan 80
  switchport trunk allowed vlan 10,20,30,40,80,99
  switchport mode trunk
 !
@@ -822,10 +823,11 @@ interface Vlan1
  no ip address
  shutdown
 !
-interface Vlan99
- ip address 172.16.10.50 255.255.255.248
+interface Vlan80
+ description S1 VLAN address
+ ip address 172.16.10.34 255.255.255.240
 !
-ip default-gateway 172.16.10.49
+ip default-gateway 172.16.10.33
 !
 banner motd ^CAuthorized Users Only!^C
 !
@@ -930,7 +932,7 @@ Trunks should look like the following for S2.
 ```bash
 S2#show interfaces trunk
 Port        Mode         Encapsulation  Status        Native vlan
-Fa0/1       on           802.1q         trunking      99
+Fa0/1       on           802.1q         trunking      80
 
 Port        Vlans allowed on trunk
 Fa0/1       10,20,30,40,80,99
@@ -948,6 +950,7 @@ vlans should now look like the following for S3.
 
 ```bash
 S3#show vlan
+
 VLAN Name                             Status    Ports
 ---- -------------------------------- --------- -------------------------------
 1    default                          active    Fa0/2, Fa0/4, Fa0/6, Fa0/8
@@ -997,7 +1000,7 @@ Trunks should look like the following for S2.
 S2#show interfaces trunk
 
 Port        Mode         Encapsulation  Status        Native vlan
-Fa0/1       on           802.1q         trunking      99
+Fa0/1       on           802.1q         trunking      80
 
 Port        Vlans allowed on trunk
 Fa0/1       10,20,30,40,80,99
@@ -1100,7 +1103,7 @@ spanning-tree mode pvst
 spanning-tree extend system-id
 !
 interface FastEthernet0/1
- switchport trunk native vlan 99
+ switchport trunk native vlan 80
  switchport trunk allowed vlan 10,20,30,40,80,99
  switchport mode trunk
 !
@@ -1210,10 +1213,11 @@ interface Vlan1
  no ip address
  shutdown
 !
-interface Vlan99
- ip address 172.16.10.51 255.255.255.248
+interface Vlan80
+ description S2 VLAN address
+ ip address 172.16.10.35 255.255.255.240
 !
-ip default-gateway 172.16.10.49
+ip default-gateway 172.16.10.33
 !
 banner motd ^CAuthorized Users Only!^C
 !
@@ -1267,7 +1271,7 @@ spanning-tree extend system-id
 !
 interface FastEthernet0/1
  description Main trunk link to R1, S1, and S2
- switchport trunk native vlan 99
+ switchport trunk native vlan 80
  switchport trunk allowed vlan 10,20,30,40,80,99
  switchport mode trunk
 !
@@ -1376,11 +1380,11 @@ interface Vlan1
  no ip address
  shutdown
 !
-interface Vlan99
- description Trunk interface
- ip address 172.16.10.52 255.255.255.248
+interface Vlan80
+ description S3 VLAN address
+ ip address 172.16.10.36 255.255.255.240
 !
-ip default-gateway 172.16.10.49
+ip default-gateway 172.16.10.33
 !
 banner motd ^CAuthorized Users Only!^C
 !
@@ -1458,9 +1462,9 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | PC-5                  | 172.16.7.253   | TRUE   |
 |             | PC-6                  | 172.16.9.252   | TRUE   |
 |             | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
@@ -1472,9 +1476,9 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | PC-5                  | 172.16.7.253   | TRUE   |
 |             | PC-6                  | 172.16.9.252   | TRUE   |
 |             | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
@@ -1485,9 +1489,9 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | PC-5                  | 172.16.7.253   | TRUE   |
 |             | PC-6                  | 172.16.9.252   | TRUE   |
 |             | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
@@ -1497,9 +1501,9 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 | PC-4        | PC-5                  | 172.16.7.253   | TRUE   |
 |             | PC-6                  | 172.16.9.252   | TRUE   |
 |             | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
@@ -1508,9 +1512,9 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
 | PC-5        | PC-6                  | 172.16.9.252   | TRUE   |
 |             | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
@@ -1518,33 +1522,33 @@ I have also added a graph showing the rest of the ping tests that I have done fo
 |             | R1 (VLAN 10)          | 172.16.10.33   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
 | PC-6        | PC-7                  | 172.16.9.254   | TRUE   |
-|             | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+|             | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.8.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.33   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
-| PC-7        | S1                    | 172.16.10.50   | TRUE   |
-|             | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+| PC-7        | S1                    | 172.16.10.34   | TRUE   |
+|             | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.8.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.33   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
-| S1          | S2                    | 172.16.10.51   | TRUE   |
-|             | S3                    | 172.16.10.52   | TRUE   |
+| S1          | S2                    | 172.16.10.35   | TRUE   |
+|             | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.8.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.33   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.49   | TRUE   |
-| S2          | S3                    | 172.16.10.52   | TRUE   |
+| S2          | S3                    | 172.16.10.36   | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.10.1    | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.0.1     | TRUE   |
 |             | R1 (VLAN 10)          | 172.16.9.1     | TRUE   |

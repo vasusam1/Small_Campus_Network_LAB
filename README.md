@@ -68,7 +68,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::1 link-local</td>
+        <td colspan=2>FE80:1::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -82,7 +82,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::2 link-local</td>
+        <td colspan=2>FE80:2::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -96,7 +96,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::3 link-local</td>
+        <td colspan=2>FE80:3::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -110,7 +110,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::4 link-local</td>
+        <td colspan=2>FE80:4::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -124,7 +124,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::5 link-local</td>
+        <td colspan=2>FE80:5::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -138,7 +138,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td colspan=2>FE80::6 link-local</td>
+        <td colspan=2>FE80:6::1 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>

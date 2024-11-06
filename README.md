@@ -42,6 +42,7 @@ Based off of that I have created the IPv4 subnets as shown below.
 | Vlan 40 (Voice IP phones) | 200       | 172.16.8.0      | 172.16.8.255       | 172.16.8.1   | 172.16.8.254 |
 | Vlan 80 (Management)      | 10        | 172.16.10.32    | 172.16.10.47       | 172.16.10.33 | 172.16.10.46 |
 | Vlan 99 (Native)          | 4         | 172.16.10.48    | 172.16.10.55       | 172.16.10.49 | 172.16.10.54 |
+| Inter-router conn         | 2         | 172.16.10.56    | 172.16.10.59       | 172.16.10.57 | 172.16.10.58 |
 
 ### Network topology diagram 
 
@@ -57,8 +58,35 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>Default Gateway</td>
     </tr>
     <tr>
-        <td rowspan=18>R1</td>
-        <td rowspan=3>G0/0/0.10 (IT)</td>
+        <td>R1</td>
+        <td>G0/0/0</td>
+        <td>172.16.10.57</td>
+        <td>N/A</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td rowspan=22>L3-S1</td>
+        <td rowspan=3>G1/0/1</td>
+        <td>172.16.10.56</td>
+        <td>255.255.255.252   /30</td>
+        <td>172.16.10.57 <-- Default Route (NOT FOR INTERFACE!) </td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:a::1/64</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:a::1 link-local</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td>G1/0/2</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td rowspan=3>VLAN 10 (IT)</td>
         <td>172.16.10.1</td>
         <td>255.255.255.224   /27</td>
         <td>N/A</td>
@@ -72,7 +100,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td rowspan=3>G0/0/0.20 (Students)</td>
+        <td rowspan=3>VLAN 20 (Students)</td>
         <td>172.16.0.1</td>
         <td>255.255.248.0     /21</td>
         <td>N/A</td>
@@ -86,7 +114,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td rowspan=3>G0/0/0.30 (Faculty)</td>
+        <td rowspan=3>VLAN 30 (Faculty)</td>
         <td>172.16.9.1</td>
         <td>255.255.255.0     /24</td>
         <td>N/A</td>
@@ -100,7 +128,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td rowspan=3>G0/0/0.40 (Voice)</td>
+        <td rowspan=3>VLAN 40 (Voice)</td>
         <td>172.16.8.1</td>
         <td>255.255.255.0     /24</td>
         <td>N/A</td>
@@ -114,7 +142,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td rowspan=3>G0/0/0.80 (Management)</td>
+        <td rowspan=3>VLAN 80 (Management)</td>
         <td>172.16.10.33</td>
         <td>255.255.255.240   /28</td>
         <td>N/A</td>
@@ -128,7 +156,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td rowspan=3>G0/0/0.99 (Native)</td>
+        <td rowspan=3>VLAN 99 (Native)</td>
         <td>172.16.10.49</td>
         <td>255.255.255.248   /29</td>
         <td>N/A</td>
@@ -142,11 +170,19 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>N/A</td>
     </tr>
     <tr>
-        <td>PC-1</td>
-        <td>NIC</td>
+        <td rowspan=3>PC-1</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.10.30</td>
         <td>255.255.255.224   /27</td>
         <td>172.16.10.1</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:1::1/64</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:1::1 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td>PC-2</td>
@@ -221,7 +257,7 @@ Based off of that I have created the IPv4 subnets as shown below.
 
 #### Router Configuration
 
-1. First I would enter into the router and configure basic settings as shown below.
+1. First, enter into the router and configure basic settings as shown below.
 
 ```bash
 Router>enable
@@ -231,6 +267,12 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 
 #Create hostname for Router as R1.
 Router(config)#hostname R1
+
+#Set no DNS lookup for R1.
+Router(config)#no ip domain-lookup
+
+#enable ipv6 unicast routing for R1.
+Router(config)#ipv6 unicast-routing
 
 #Set Privilaged Exec mode as the following.
 R1(config)#enable secret $Cisc0!!PRIV*
@@ -266,7 +308,17 @@ R1#clock set 13:00:00 NOV 4 2024
 R1# copy running-config startup-config
 ```
 
-2. Shutdown unused interfaces
+2. Set the IP address for g0/0/0 according to the addressing table.
+
+```bash
+R1(config)#interface GigabitEthernet 0/0/0
+R1(config-if)#description Connects to LAN
+R1(config-if)#ip address 172.16.10.58 255.255.255.252
+R1(config-if)#no shutdown
+R1(config-if)#exit
+```
+
+3. Shutdown unused interfaces
 
 ```bash
 R1(config)#interface range gigabitEthernet 0/0/1, gigabitEthernet 0/0/2
@@ -279,120 +331,11 @@ R1(config-if-range)#
 %LINK-5-CHANGED: Interface GigabitEthernet0/0/2, changed state to administratively down
 ```
 
-3. I would then enable sub interfaces for the vlans shown in the addressing table.
-
-3a. Assign GigabitEthernet0/0/0.10 to VLAN 10 (IT).
-```bash
-R1#config t
-
-# Assign GigabitEthernet0/0/0.10 to VLAN 10 (IT)
-R1(config)# interface GigabitEthernet0/0/0.10
-R1(config-if)# encapsulation dot1Q 10
-R1(config-if)# ip address 172.16.10.1 255.255.255.224
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-3b. Assign GigabitEthernet0/0/0.20 to VLAN 20 (Students).
-
-```bash
-# Assign GigabitEthernet0/0/0.20 to VLAN 20 (Students)
-R1(config)# interface GigabitEthernet0/0/0.20
-R1(config-if)# encapsulation dot1Q 20
-R1(config-if)# ip address 172.16.0.1 255.255.248.0
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-3c. Assign GigabitEthernet0/0/0.30 to VLAN 30 (Faculty).
-
-```bash
-# Assign GigabitEthernet0/0/0.30 to VLAN 30 (Faculty)
-R1(config)# interface GigabitEthernet0/0/0.30
-R1(config-if)# encapsulation dot1Q 30
-R1(config-if)# ip address 172.16.9.1 255.255.255.0
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-3d. Assign GigabitEthernet0/0/0.40 to VLAN 40 (Voice).
-
-```bash
-# Assign GigabitEthernet0/0/0.40 to VLAN 40 (Voice)
-R1(config)# interface GigabitEthernet0/0/0.40
-R1(config-if)# encapsulation dot1Q 40
-R1(config-if)# ip address 172.16.8.1 255.255.255.0
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-3e. Assign GigabitEthernet0/0/0.80 to VLAN 80 (Management) and set as native.
-
-```bash
-# Assign GigabitEthernet0/0/0.80 to VLAN 80 (Management)
-R1(config)# interface GigabitEthernet0/0/0.80
-R1(config-if)# encapsulation dot1Q 80 native
-R1(config-if)# ip address 172.16.10.33 255.255.255.240
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-3f. Assign GigabitEthernet0/0/0.99 to VLAN 99 (Native).
-
-```bash
-# Assign GigabitEthernet0/0/0.99 to VLAN 99 (Native)
-R1(config)# interface GigabitEthernet0/0/0.99
-R1(config-if)# encapsulation dot1Q 99
-R1(config-if)# ip address 172.16.10.49 255.255.255.248
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-3g. Save configuration of sub interfaces GigabitEthernet0/0/0.
-
-```bash
-# Save configuration of sub interfaces GigabitEthernet0/0/0
-R1(config)# interface GigabitEthernet0/0/0
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# 
-```
-
-This is the result
-
-```bash
-# ip interfaces created.
-R1#show ip interface brief
-Interface                 IP-Address      OK? Method Status                Protocol 
-GigabitEthernet0/0/0      unassigned      YES unset  up                    up 
-GigabitEthernet0/0/0.10   172.16.10.1     YES manual up                    up 
-GigabitEthernet0/0/0.20   172.16.0.1      YES manual up                    up 
-GigabitEthernet0/0/0.30   172.16.9.1      YES manual up                    up 
-GigabitEthernet0/0/0.40   172.16.8.1      YES manual up                    up 
-GigabitEthernet0/0/0.80   172.16.10.33    YES manual up                    up 
-GigabitEthernet0/0/0.99   172.16.10.49    YES manual up                    up 
-GigabitEthernet0/0/1      unassigned      YES unset  administratively down down 
-GigabitEthernet0/0/2      unassigned      YES unset  administratively down down 
-Vlan1                     unassigned      YES unset  administratively down down
-R1#
-```
-
-4. Save the running configuration
-
-```bash
-R1#copy running-config startup-config
-```
-
-result from all of this
+R1 should now look like the following.
 
 ```bash
 R1#show startup-config
-Using 2004 bytes
+Using 1331 bytes
 !
 version 15.4
 no service timestamps log datetime msec
@@ -413,6 +356,8 @@ enable secret 5 $1$mERr$pXbOzYqH7/9wPQGAu0P2W0
 !
 !
 ip cef
+ipv6 unicast-routing
+!
 no ipv6 cef
 !
 !
@@ -435,39 +380,10 @@ spanning-tree mode pvst
 !
 !
 interface GigabitEthernet0/0/0
- no ip address
+ description Connects to LAN
+ ip address 172.16.10.58 255.255.255.252
  duplex auto
  speed auto
-!
-interface GigabitEthernet0/0/0.10
- description IT VLAN
- encapsulation dot1Q 10
- ip address 172.16.10.1 255.255.255.224
-!
-interface GigabitEthernet0/0/0.20
- description Students VLAN
- encapsulation dot1Q 20
- ip address 172.16.0.1 255.255.248.0
-!
-interface GigabitEthernet0/0/0.30
- description Faculty VLAN
- encapsulation dot1Q 30
- ip address 172.16.9.1 255.255.255.0
-!
-interface GigabitEthernet0/0/0.40
- description Voice VLAN
- encapsulation dot1Q 40
- ip address 172.16.8.1 255.255.255.0
-!
-interface GigabitEthernet0/0/0.80
- description Management VLAN
- encapsulation dot1Q 80 native
- ip address 172.16.10.33 255.255.255.240
-!
-interface GigabitEthernet0/0/0.99
- description Trunk VLAN
- encapsulation dot1Q 99
- ip address 172.16.10.49 255.255.255.248
 !
 interface GigabitEthernet0/0/1
  description Unused
@@ -521,6 +437,408 @@ line vty 5 15
  password 7 08656F471A1A5556533D383D6061
  login
  transport input ssh
+!
+!
+!
+end
+```
+
+#### Layer 3 Switch Configuration
+
+1. Complete step 1 for router configuration on the Layer 3 switch assigning the appropriate hostname in accordance with the addressing table.
+
+2. Create vlan 10 and assign it the name stated in the addressing table. Do the same for the rest of the VLANs in the addressing table (VLANs 20,30,40,80, and 99).
+   
+```bash
+L3-S1#config t
+
+# Create VLAN 10 and assign it the name IT.
+L3-S1(config)# vlan 10
+L3-S1(config-vlan)# name IT
+L3-S1(config)# 
+```
+
+3. Assign ip addresses for the vlans shown in the addressing table. VLAN 10 is shown below
+
+```bash
+L3-S1#config t
+
+# Assign to VLAN 10 (IT) an ip address
+L3-S1(config)# interface vlan 10
+L3-S1(config-if)# description IT vlan
+L3-S1(config-if)# ip address 172.16.10.1 255.255.255.224
+L3-S1(config-if)# ipv6 address FE80:1::1 link-local
+L3-S1(config-if)# ipv6 address 2001:DB8:ACAD:1::1/64
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# 
+```
+
+3b. Configure interface GigabitEthernet1/0/1.
+
+```bash
+# Configure and save interface GigabitEthernet1/0/1
+L3-S1(config)# interface GigabitEthernet1/0/1
+L3-S1(config-if)# description To Internet Firewall
+L3-S1(config-if)# no switchport
+L3-S1(config-if)# ip address 172.16.10.57 255.255.255.252
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# 
+```
+
+3c. Shutdown all unused interfaces.
+```bash
+L3-S1(config)#interface range GigabitEthernet1/0/3-24, GigabitEthernet1/1/1-4
+L3-S1(config-if)# description Unused
+L3-S1(config-if-range)#shutdown
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/3, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/4, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/5, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/6, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/7, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/8, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/9, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/10, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/11, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/12, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/13, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/14, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/15, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/16, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/17, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/18, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/19, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/20, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/21, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/22, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/23, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/0/24, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/1/1, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/1/2, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/1/3, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet1/1/4, changed state to administratively down
+L3-S1(config-if-range)#
+```
+
+This is the result
+
+```bash
+# ip interfaces created.
+L3-S1#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol 
+GigabitEthernet1/0/1   172.16.10.57    YES manual up                    up 
+GigabitEthernet1/0/2   unassigned      YES unset  up                    up 
+GigabitEthernet1/0/3   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/4   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/5   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/6   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/7   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/8   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/9   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/10  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/11  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/12  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/13  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/14  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/15  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/16  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/17  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/18  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/19  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/20  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/21  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/22  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/23  unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/24  unassigned      YES unset  administratively down down 
+GigabitEthernet1/1/1   unassigned      YES unset  administratively down down 
+GigabitEthernet1/1/2   unassigned      YES unset  administratively down down 
+GigabitEthernet1/1/3   unassigned      YES unset  administratively down down 
+GigabitEthernet1/1/4   unassigned      YES unset  administratively down down 
+Vlan1                  unassigned      YES unset  administratively down down 
+Vlan10                 172.16.10.1     YES manual up                    up 
+Vlan20                 172.16.0.1      YES manual up                    up 
+Vlan30                 172.16.9.1      YES manual up                    up 
+Vlan40                 172.16.8.1      YES manual up                    up 
+Vlan80                 172.16.10.33    YES manual up                    up 
+Vlan99                 172.16.10.49    YES manual up                    up
+L3-S1#
+```
+
+4. Save the running configuration
+
+```bash
+R1#copy running-config startup-config
+```
+
+result from all of this
+
+```bash
+R1#show startup-config
+Using 3976 bytes
+!
+version 16.3.2
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname L3-S1
+!
+login block-for 180 attempts 3 within 120
+!
+enable secret 5 $1$mERr$pXbOzYqH7/9wPQGAu0P2W0
+!
+!
+!
+!
+!
+!
+no ip cef
+ipv6 unicast-routing
+!
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain-lookup
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet1/0/1
+ description To Internet Firewall
+ no switchport
+ ip address 172.16.10.57 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/2
+ description To local network
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,30,40,80,99
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/3
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/4
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/5
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/6
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/7
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/8
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/9
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/10
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/11
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/12
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/13
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/14
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/15
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/16
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/17
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/18
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/19
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/20
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/21
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/22
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/23
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/0/24
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/1/1
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/1/2
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/1/3
+ description Unused
+ shutdown
+!
+interface GigabitEthernet1/1/4
+ description Unused
+ shutdown
+!
+interface Vlan1
+ description Unused
+ no ip address
+ shutdown
+!
+interface Vlan10
+ description IT vlan
+ mac-address 0010.1168.2501
+ ip address 172.16.10.1 255.255.255.224
+ ipv6 address FE80:1::1 link-local
+ ipv6 address 2001:DB8:ACAD:1::1/64
+!
+interface Vlan20
+ description Students vlan
+ mac-address 0010.1168.2502
+ ip address 172.16.0.1 255.255.248.0
+ ipv6 address FE80:2::1 link-local
+ ipv6 address 2001:DB8:ACAD:2::1/64
+!
+interface Vlan30
+ description Faculty vlan
+ mac-address 0010.1168.2503
+ ip address 172.16.9.1 255.255.255.0
+ ipv6 address FE80:3::1 link-local
+ ipv6 address 2001:DB8:ACAD:3::1/64
+!
+interface Vlan40
+ description Voice vlan
+ mac-address 0010.1168.2504
+ ip address 172.16.8.1 255.255.255.0
+ ipv6 address FE80:4::1 link-local
+ ipv6 address 2001:DB8:ACAD:4::1/64
+!
+interface Vlan80
+ description Management vlan
+ mac-address 0010.1168.2505
+ ip address 172.16.10.33 255.255.255.240
+ ipv6 address FE80:5::1 link-local
+ ipv6 address 2001:DB8:ACAD:5::1/64
+!
+interface Vlan99
+ description Native vlan
+ mac-address 0010.1168.2506
+ ip address 172.16.10.49 255.255.255.248
+ ipv6 address FE80:6::1 link-local
+ ipv6 address 2001:DB8:ACAD:6::1/64
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 172.16.10.58 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended sl_def_acl
+ deny tcp any any eq telnet
+ deny tcp any any eq www
+ deny tcp any any eq 22
+ permit tcp any any eq 22
+!
+banner motd ^CAuthorized Users Only!^C
+!
+!
+!
+!
+line con 0
+ exec-timeout 5 0
+ password 7 08656F471A1A55565328232A1961
+ login
+!
+line aux 0
+!
+line vty 0 4
+ exec-timeout 7 0
+ password 7 08656F471A1A5556533D383D6061
+ login
+ transport input ssh
+!
 !
 !
 !

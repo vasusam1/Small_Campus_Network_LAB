@@ -57,7 +57,7 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>Default Gateway</td>
     </tr>
     <tr>
-        <td rowspan=12>R1</td>
+        <td rowspan=18>R1</td>
         <td rowspan=3>G0/0/0.10 (IT)</td>
         <td>172.16.10.1</td>
         <td>255.255.255.224   /27</td>
@@ -65,7 +65,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:1::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::1 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td rowspan=3>G0/0/0.20 (Students)</td>
@@ -75,7 +79,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:2::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::2 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td rowspan=3>G0/0/0.30 (Faculty)</td>
@@ -85,7 +93,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:3::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::3 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td rowspan=3>G0/0/0.40 (Voice)</td>
@@ -95,7 +107,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:4::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::4 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td rowspan=3>G0/0/0.80 (Management)</td>
@@ -105,7 +121,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:5::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::5 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td rowspan=3>G0/0/0.99 (Native)</td>
@@ -115,7 +135,11 @@ Based off of that I have created the IPv4 subnets as shown below.
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:6::1/64</td>
-        <td></td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80::6 link-local</td>
+        <td>N/A</td>
     </tr>
     <tr>
         <td>PC-1</td>

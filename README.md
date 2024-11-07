@@ -42,7 +42,7 @@ Based off of that I have created the IPv4 subnets as shown below.
 | Vlan 40 (Voice IP phones) | 200       | 172.16.8.0      | 172.16.8.255       | 172.16.8.1   | 172.16.8.254 |
 | Vlan 80 (Management)      | 10        | 172.16.10.32    | 172.16.10.47       | 172.16.10.33 | 172.16.10.46 |
 | Vlan 99 (Native)          | 4         | 172.16.10.48    | 172.16.10.55       | 172.16.10.49 | 172.16.10.54 |
-| Inter-router conn         | 2         | 172.16.10.56    | 172.16.10.59       | 172.16.10.57 | 172.16.10.58 |
+| Inter-router conn         | 2         | 209.165.200.224 | 209.165.200.227    | 209.165.200.225 | 209.165.200.226 |
 
 ### Network topology diagram 
 
@@ -60,7 +60,7 @@ Based off of that I have created the IPv4 subnets as shown below.
     <tr>
         <td rowspan=3>R1</td>
         <td rowspan=3>G0/0/0</td>
-        <td>172.16.10.57</td>
+        <td>209.165.200.226</td>
         <td>N/A</td>
         <td>N/A</td>
     </tr>
@@ -75,9 +75,9 @@ Based off of that I have created the IPv4 subnets as shown below.
     <tr>
         <td rowspan=22>L3-S1</td>
         <td rowspan=3>G1/0/1</td>
-        <td>172.16.10.56</td>
+        <td>209.165.200.225</td>
         <td>255.255.255.252   /30</td>
-        <td>172.16.10.57 <-- Default Route (NOT FOR INTERFACE!) </td>
+        <td>N/A </td>
     </tr>
     <tr>
         <td colspan=2>2001:db8:acad:a::1/64</td>

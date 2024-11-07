@@ -58,10 +58,18 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>Default Gateway</td>
     </tr>
     <tr>
-        <td>R1</td>
-        <td>G0/0/0</td>
+        <td rowspan=3>R1</td>
+        <td rowspan=3>G0/0/0</td>
         <td>172.16.10.57</td>
         <td>N/A</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:a::2/64</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:a::2 link-local</td>
         <td>N/A</td>
     </tr>
     <tr>
@@ -177,54 +185,102 @@ Based off of that I have created the IPv4 subnets as shown below.
         <td>172.16.10.1</td>
     </tr>
     <tr>
-        <td colspan=2>2001:db8:acad:1::1/64</td>
-        <td>N/A</td>
+        <td colspan=2>2001:db8:acad:1::2/64</td>
+        <td>2001:db8:acad:1::1/64</td>
     </tr>
     <tr>
-        <td colspan=2>FE80:1::1 link-local</td>
-        <td>N/A</td>
+        <td colspan=2>FE80:1::2 link-local</td>
+        <td>FE80:1::1 link-local</td>
     </tr>
     <tr>
-        <td>PC-2</td>
-        <td>NIC</td>
+        <td rowspan=3>PC-2</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.7.254</td>
         <td>255.255.248.0     /21</td>
         <td>172.16.0.1</td>
     </tr>
     <tr>
-        <td>PC-3</td>
-        <td>NIC</td>
+        <td colspan=2>2001:db8:acad:2::2/64</td>
+        <td>2001:db8:acad:2::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:2::2 link-local</td>
+        <td>FE80:2::1 link-local</td>
+    </tr>
+    <tr>
+        <td rowspan=3>PC-3</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.9.253</td>
         <td>255.255.255.0     /24</td>
         <td>172.16.9.1</td>
     </tr>
     <tr>
-        <td>PC-4</td>
-        <td>NIC</td>
+        <td colspan=2>2001:db8:acad:3::2/64</td>
+        <td>2001:db8:acad:3::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:3::2 link-local</td>
+        <td>FE80:3::1 link-local</td>
+    </tr>
+    <tr>
+        <td rowspan=3>PC-4</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.10.29</td>
         <td>255.255.255.224   /27</td>
         <td>172.16.10.1</td>
     </tr>
     <tr>
-        <td>PC-5</td>
-        <td>NIC</td>
+        <td colspan=2>2001:db8:acad:1::3/64</td>
+        <td>2001:db8:acad:1::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:1::3 link-local</td>
+        <td>FE80:1::1 link-local</td>
+    </tr>
+    <tr>
+        <td rowspan=3>PC-5</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.7.253</td>
         <td>255.255.248.0     /21</td>
         <td>172.16.0.1</td>
     </tr>
     <tr>
-        <td>PC-6</td>
-        <td>NIC</td>
+        <td colspan=2>2001:db8:acad:2::3/64</td>
+        <td>2001:db8:acad:2::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:2::3 link-local</td>
+        <td>FE80:2::1 link-local</td>
+    </tr>
+    <tr>
+        <td rowspan=3>PC-6</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.9.252</td>
         <td>255.255.255.0     /24</td>
         <td>172.16.9.1</td>
     </tr>
     <tr>
-        <td>PC-7</td>
-        <td>NIC</td>
+        <td colspan=2>2001:db8:acad:3::3/64</td>
+        <td>2001:db8:acad:3::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:3::3 link-local</td>
+        <td>FE80:3::1 link-local</td>
+    </tr>
+    <tr>
+        <td rowspan=3>PC-7</td>
+        <td rowspan=3>NIC</td>
         <td>172.16.9.254</td>
         <td>255.255.255.0     /24</td>
         <td>172.16.9.1</td>
+    </tr>
+    <tr>
+        <td colspan=2>2001:db8:acad:3::4/64</td>
+        <td>2001:db8:acad:3::1/64</td>
+    </tr>
+    <tr>
+        <td colspan=2>FE80:3::4 link-local</td>
+        <td>FE80:3::1 link-local</td>
     </tr>
     <tr>
         <td>S1</td>
@@ -482,6 +538,8 @@ L3-S1(config)# interface GigabitEthernet1/0/1
 L3-S1(config-if)# description To Internet Firewall
 L3-S1(config-if)# no switchport
 L3-S1(config-if)# ip address 172.16.10.57 255.255.255.252
+L3-S1(config-if)#ipv6 address 2001:db8:acad:a::1/64
+L3-S1(config-if)#ipv6 address FE80:a::1 link-local
 L3-S1(config-if)# no shutdown
 L3-S1(config-if)# exit
 L3-S1(config)# 

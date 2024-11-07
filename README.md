@@ -369,12 +369,25 @@ R1# copy running-config startup-config
 ```bash
 R1(config)#interface GigabitEthernet 0/0/0
 R1(config-if)#description Connects to LAN
-R1(config-if)#ip address 172.16.10.58 255.255.255.252
+R1(config-if)#ip address 209.165.200.226 255.255.255.252
+R1(config-if)#ipv6 address 2001:db8:acad:a::2/64
 R1(config-if)#no shutdown
 R1(config-if)#exit
 ```
 
-3. Shutdown unused interfaces
+3. Set up OSPF on R1 shown above.
+
+```bash
+R1(config)# router ospf 10
+R1(config-router)# network 209.165.200.224 0.0.0.3 area 0
+R1(config-router)# exit
+R1(config)# ipv6 router ospf 10
+R1(config)# interface GigabitEthernet0/0/0
+R1(config-if)# ipv6 ospf 10 area 0
+R1(config-if)# exit
+```
+
+4. Shutdown unused interfaces
 
 ```bash
 R1(config)#interface range gigabitEthernet 0/0/1, gigabitEthernet 0/0/2
@@ -391,7 +404,7 @@ R1 should now look like the following.
 
 ```bash
 R1#show startup-config
-Using 1331 bytes
+Using 1794 bytes
 !
 version 15.4
 no service timestamps log datetime msec
@@ -411,7 +424,7 @@ enable secret 5 $1$mERr$pXbOzYqH7/9wPQGAu0P2W0
 !
 !
 !
-ip cef
+no ip cef
 ipv6 unicast-routing
 !
 no ipv6 cef
@@ -437,9 +450,11 @@ spanning-tree mode pvst
 !
 interface GigabitEthernet0/0/0
  description Connects to LAN
- ip address 172.16.10.58 255.255.255.252
+ ip address 209.165.200.226 255.255.255.252
  duplex auto
  speed auto
+ ipv6 address FE80:A::2 link-local
+ ipv6 address 2001:DB8:ACAD:A::2/64
 !
 interface GigabitEthernet0/0/1
  description Unused
@@ -460,10 +475,20 @@ interface Vlan1
  no ip address
  shutdown
 !
+router ospf 10
+ log-adjacency-changes
+ network 209.165.200.224 0.0.0.3 area 0
+!
 ip classless
 !
 ip flow-export version 9
 !
+ipv6 route 2001:DB8:ACAD:1::/64 2001:DB8:ACAD:A::1
+ipv6 route 2001:DB8:ACAD:2::/64 2001:DB8:ACAD:A::1
+ipv6 route 2001:DB8:ACAD:3::/64 2001:DB8:ACAD:A::1
+ipv6 route 2001:DB8:ACAD:4::/64 2001:DB8:ACAD:A::1
+ipv6 route 2001:DB8:ACAD:5::/64 2001:DB8:ACAD:A::1
+ipv6 route 2001:DB8:ACAD:6::/64 2001:DB8:ACAD:A::1
 !
 ip access-list extended sl_def_acl
  deny tcp any any eq telnet
@@ -512,6 +537,46 @@ L3-S1#config t
 L3-S1(config)# vlan 10
 L3-S1(config-vlan)# name IT
 L3-S1(config)# 
+```
+
+3. Set up OSPF for the switch
+
+```bash
+L3-S1(config)# router ospf 10
+L3-S1(config-router)# network 172.16.10.0 0.0.0.31 area 0
+L3-S1(config-router)# network 172.16.0.0 0.0.7.255 area 0
+L3-S1(config-router)# network 172.16.8.0 0.0.0.255 area 0
+L3-S1(config-router)# network 172.16.9.0 0.0.0.255 area 0
+L3-S1(config-router)# network 172.16.10.32 0.0.0.15 area 0
+L3-S1(config-router)# network 172.16.10.48 0.0.0.7 area 0
+L3-S1(config-router)# network 209.165.200.224 0.0.0.3 area 0
+L3-S1(config-router)# exit
+L3-S1(config)# ipv6 router ospf 10
+L3-S1(config)# interface vlan 10
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# interface vlan 20
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# interface vlan 30
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# interface vlan 40
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# interface vlan 80
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+L3-S1(config)# interface vlan 99
+L3-S1(config-if)# ipv6 ospf 10 area 0
+L3-S1(config-if)# no shutdown
+L3-S1(config-if)# exit
+
 ```
 
 3. Assign ip addresses for the vlans shown in the addressing table. VLAN 10 is shown below
@@ -611,34 +676,34 @@ This is the result
 # ip interfaces created.
 L3-S1#show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol 
-GigabitEthernet1/0/1   172.16.10.57    YES manual up                    up 
-GigabitEthernet1/0/2   unassigned      YES unset  up                    up 
-GigabitEthernet1/0/3   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/4   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/5   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/6   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/7   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/8   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/9   unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/10  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/11  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/12  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/13  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/14  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/15  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/16  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/17  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/18  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/19  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/20  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/21  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/22  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/23  unassigned      YES unset  administratively down down 
-GigabitEthernet1/0/24  unassigned      YES unset  administratively down down 
-GigabitEthernet1/1/1   unassigned      YES unset  administratively down down 
-GigabitEthernet1/1/2   unassigned      YES unset  administratively down down 
-GigabitEthernet1/1/3   unassigned      YES unset  administratively down down 
-GigabitEthernet1/1/4   unassigned      YES unset  administratively down down 
+GigabitEthernet1/0/1   209.165.200.225 YES manual up                    up 
+GigabitEthernet1/0/2   unassigned      YES NVRAM  up                    up 
+GigabitEthernet1/0/3   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/4   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/5   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/6   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/7   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/8   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/9   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/10  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/11  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/12  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/13  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/14  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/15  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/16  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/17  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/18  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/19  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/20  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/21  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/22  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/23  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/0/24  unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/1/1   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/1/2   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/1/3   unassigned      YES NVRAM  administratively down down 
+GigabitEthernet1/1/4   unassigned      YES NVRAM  administratively down down 
 Vlan1                  unassigned      YES unset  administratively down down 
 Vlan10                 172.16.10.1     YES manual up                    up 
 Vlan20                 172.16.0.1      YES manual up                    up 
@@ -659,7 +724,7 @@ result from all of this
 
 ```bash
 R1#show startup-config
-Using 3976 bytes
+Using 4464 bytes
 !
 version 16.3.2
 no service timestamps log datetime msec
@@ -678,6 +743,8 @@ enable secret 5 $1$mERr$pXbOzYqH7/9wPQGAu0P2W0
 !
 !
 no ip cef
+ip routing
+!
 ipv6 unicast-routing
 !
 no ipv6 cef
@@ -704,11 +771,12 @@ spanning-tree mode pvst
 !
 !
 interface GigabitEthernet1/0/1
- description To Internet Firewall
  no switchport
- ip address 172.16.10.57 255.255.255.252
+ ip address 209.165.200.225 255.255.255.252
  duplex auto
  speed auto
+ ipv6 address FE80:A::1 link-local
+ ipv6 address 2001:DB8:ACAD:A::1/64
 !
 interface GigabitEthernet1/0/2
  description To local network
@@ -831,6 +899,7 @@ interface Vlan10
  ip address 172.16.10.1 255.255.255.224
  ipv6 address FE80:1::1 link-local
  ipv6 address 2001:DB8:ACAD:1::1/64
+ ipv6 ospf 10 area 0
 !
 interface Vlan20
  description Students vlan
@@ -838,6 +907,7 @@ interface Vlan20
  ip address 172.16.0.1 255.255.248.0
  ipv6 address FE80:2::1 link-local
  ipv6 address 2001:DB8:ACAD:2::1/64
+ ipv6 ospf 10 area 0
 !
 interface Vlan30
  description Faculty vlan
@@ -845,6 +915,7 @@ interface Vlan30
  ip address 172.16.9.1 255.255.255.0
  ipv6 address FE80:3::1 link-local
  ipv6 address 2001:DB8:ACAD:3::1/64
+ ipv6 ospf 10 area 0
 !
 interface Vlan40
  description Voice vlan
@@ -852,6 +923,7 @@ interface Vlan40
  ip address 172.16.8.1 255.255.255.0
  ipv6 address FE80:4::1 link-local
  ipv6 address 2001:DB8:ACAD:4::1/64
+ ipv6 ospf 10 area 0
 !
 interface Vlan80
  description Management vlan
@@ -859,6 +931,7 @@ interface Vlan80
  ip address 172.16.10.33 255.255.255.240
  ipv6 address FE80:5::1 link-local
  ipv6 address 2001:DB8:ACAD:5::1/64
+ ipv6 ospf 10 area 0
 !
 interface Vlan99
  description Native vlan
@@ -866,9 +939,22 @@ interface Vlan99
  ip address 172.16.10.49 255.255.255.248
  ipv6 address FE80:6::1 link-local
  ipv6 address 2001:DB8:ACAD:6::1/64
+ ipv6 ospf 10 area 0
+!
+router ospf 10
+ log-adjacency-changes
+ network 172.16.10.0 0.0.0.31 area 0
+ network 172.16.0.0 0.0.7.255 area 0
+ network 172.16.8.0 0.0.0.255 area 0
+ network 172.16.9.0 0.0.0.255 area 0
+ network 172.16.10.32 0.0.0.15 area 0
+ network 172.16.10.48 0.0.0.7 area 0
+ network 209.165.200.224 0.0.0.3 area 0
+!
+ipv6 router ospf 10
+ log-adjacency-changes
 !
 ip classless
-ip route 0.0.0.0 0.0.0.0 172.16.10.58 
 !
 ip flow-export version 9
 !

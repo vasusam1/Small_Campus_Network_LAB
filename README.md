@@ -2025,31 +2025,31 @@ end
 
 PC-1 configuration
 
-![PC-1](https://github.com/user-attachments/assets/7b95817e-f0be-4ba1-8693-568fe9f55568)
+![PC-1](https://github.com/user-attachments/assets/c731d09e-d94a-4deb-a9c0-f5c3af83a23d)
 
 PC-2 configuration
 
-![PC-2](https://github.com/user-attachments/assets/08ba1c7c-753e-45c6-a2af-b57b084c8e0b)
+![PC-2](https://github.com/user-attachments/assets/2df90fca-aba2-4281-972c-1227f404c299)
 
 PC-3 configuration
 
-![PC-3](https://github.com/user-attachments/assets/ee378c71-5be2-4895-8bfd-b83411d116be)
+![PC-3](https://github.com/user-attachments/assets/128f38c2-d664-4fa3-8603-3179412da9b7)
 
 PC-4 configuration
 
-![PC-4](https://github.com/user-attachments/assets/a24cc1cc-1da4-4333-9d99-aa3c48205dcf)
+![PC-4](https://github.com/user-attachments/assets/7733c240-b5ac-4bb2-a728-f8d51447d77b)
 
 PC-5 configuration
 
-![PC-5](https://github.com/user-attachments/assets/79d452f0-b1bb-4f07-bd6a-613372a8a960)
+![PC-5](https://github.com/user-attachments/assets/3074110f-735b-4685-8849-f2718bebce04)
 
 PC-6 configuration
 
-![PC-6](https://github.com/user-attachments/assets/dcd8ac0b-f9c8-4789-90ea-aa23654289b8)
+![PC-6](https://github.com/user-attachments/assets/9fd31518-6602-4378-983e-9f73ecb72077)
 
 PC-7 configuration
 
-![PC-7](https://github.com/user-attachments/assets/fcb780c2-a575-40e8-8307-74f0a08416c7)
+![PC-7](https://github.com/user-attachments/assets/03c05d7b-45f1-4fbf-adca-5e34084a65dd)
 
 ### Verification of configuration
 
